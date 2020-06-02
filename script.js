@@ -20,38 +20,56 @@ function showSuccess(input) {
 }
 
 // email validation
-function isValidEmail(email) {
+function checkEmail(input) {
     const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
+    if (re.test(input)) {
+        showSuccess(input);
+    } else{
+        showError(input, 'Email is not valid');
+    }
+}
+
+// check required fields
+function checkRequired(inputArr) {
+    inputArr.forEach(function(input){
+        if(input.value.trim() === '') {
+            showError(input, `${getFieldName(input)} is required`);
+        } else {
+            showSuccess(input)
+        }
+    });
+}
+
+// check input length
+function checkLength(input, min, max) {
+    if(input.value.length < min) {
+        showError(input, `${getFieldName(input)} must be at least ${min} characters`);
+    } else if(input.value.length > max) {
+        showError(input, `${getFieldName(input)} must be at less than ${max} characters`);
+} else {
+    showSuccess(input.value);
+    }
+}
+
+// check passwords match
+function checkPasswordMatch(input1, input2) {
+    if(input1.value !== input2.value) {
+        showError(input, 'Password do not match');
+    }
+}
+
+// get field name
+function getFieldName(input) {
+    return input.id.charAt(0).toUpperCase() + input.id.slice(1)
 }
 
 // Event listeners
 form.addEventListener('submit', function(e){
     e.preventDefault();
 
-    if (username.value === '') {
-        showError(username, 'Username is required')
-    } else {
-        showSuccess (username);
-    }
-
-    if (email.value === '') {
-        showError(email, 'Email is required')
-    } else if(!isValidEmail(email.value)){
-        showError(email, 'Email is not valid');
-    } else {
-        showSuccess (email);
-    }
-
-    if (password.value === '') {
-        showError(password, 'Password is required')
-    } else {
-        showSuccess (password);
-    }
-
-    if (password2.value === '') {
-        showError(password2, 'Please confirm password')
-    } else {
-        showSuccess (password2);
-    }
-})
+checkRequired([username, email, password, password2]);
+checkLength(username, 3, 15);
+checkLength(password, 6, 25);
+checkEmail(email);
+checkPasswordMatch(password, password2);
+});
